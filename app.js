@@ -73,8 +73,8 @@ function renderLoginPage() {
         <div class="login-container">
             <div class="login-card">
                 <h1>🔐 تسجيل الدخول</h1>
-                <input type="text" id="loginUsername" placeholder="اسم المستخدم">
-                <input type="password" id="loginPassword" placeholder="كلمة المرور">
+                <input type="text" id="loginUsername" placeholder="اسم المستخدم" autocomplete="off">
+                <input type="password" id="loginPassword" placeholder="كلمة المرور" autocomplete="off">
                 <button onclick="handleLogin()">دخول</button>
                 <a href="#" onclick="navigateTo('register')" class="link">📝 ليس لديك حساب؟ سجل الآن</a>
                 <a href="#" onclick="navigateTo('forgot')" class="link">🔑 نسيت كلمة المرور؟</a>
