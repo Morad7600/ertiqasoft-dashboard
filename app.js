@@ -89,10 +89,10 @@ function renderRegisterPage() {
         <div class="login-container">
             <div class="login-card">
                 <h1>📝 إنشاء حساب جديد</h1>
-                <input type="text" id="regUsername" placeholder="اسم المستخدم">
-                <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
-                <input type="password" id="regPassword" placeholder="كلمة المرور">
-                <input type="password" id="regConfirm" placeholder="تأكيد كلمة المرور">
+                <input type="text" id="regUsername" placeholder="اسم المستخدم" autocomplete="off">
+                <input type="email" id="regEmail" placeholder="البريد الإلكتروني" autocomplete="off">
+                <input type="password" id="regPassword" placeholder="كلمة المرور" autocomplete="off">
+                <input type="password" id="regConfirm" placeholder="تأكيد كلمة المرور" autocomplete="off">
                 <button onclick="handleRegister()">تسجيل</button>
                 <a href="#" onclick="navigateTo('login')" class="link">🔐 لديك حساب؟ سجل دخول</a>
                 <div id="regMsg"></div>
@@ -106,9 +106,9 @@ function renderForgotPage() {
         <div class="login-container">
             <div class="login-card">
                 <h1>🔑 استعادة كلمة المرور</h1>
-                <input type="text" id="forgotUsername" placeholder="اسم المستخدم">
-                <input type="email" id="forgotEmail" placeholder="البريد الإلكتروني">
-                <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة">
+                <input type="text" id="forgotUsername" placeholder="اسم المستخدم" autocomplete="off">
+                <input type="email" id="forgotEmail" placeholder="البريد الإلكتروني" autocomplete="off">
+                <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة" autocomplete="off">
                 <button onclick="handleForgot()">إعادة تعيين</button>
                 <a href="#" onclick="navigateTo('login')" class="link">🔐 تذكرت كلمة المرور؟ سجل دخول</a>
                 <div id="forgotMsg"></div>
@@ -213,19 +213,19 @@ function renderStatsPage() {
 
 function renderAdminPage() {
     const users = JSON.parse(localStorage.getItem("users")) || [];
-    let usersHtml = '<td><thead><tr><th>المستخدم</th><th>البريد</th><th>الصلاحية</th><th>آخر دخول</th><th>حذف</th></tr></thead><tbody>';
+    let usersHtml = '<tr><thead>运转<th>المستخدم</th><th>البريد</th><th>الصلاحية</th><th>آخر دخول</th><th>حذف</th></tr></thead><tbody>';
     users.forEach((user, idx) => {
         usersHtml += `<tr><td>${user.username}</td><td>${user.email}</td><td>${user.role === 'admin' ? 'مدير' : 'مستخدم'}</td><td>${user.lastLogin || '—'}</td><td><button onclick="deleteUser(${idx})">حذف</button></td></tr>`;
     });
-    usersHtml += '</tbody></td>';
+    usersHtml += '</tbody></tr>';
     return `
         ${renderTopBar()}
         <h1>👑 لوحة المدير</h1>
         ${usersHtml}
         <h3>➕ إضافة مستخدم جديد</h3>
-        <input type="text" id="newUsername" placeholder="اسم المستخدم">
-        <input type="email" id="newEmail" placeholder="البريد">
-        <input type="password" id="newPassword" placeholder="كلمة المرور">
+        <input type="text" id="newUsername" placeholder="اسم المستخدم" autocomplete="off">
+        <input type="email" id="newEmail" placeholder="البريد" autocomplete="off">
+        <input type="password" id="newPassword" placeholder="كلمة المرور" autocomplete="off">
         <button onclick="addUser()">إضافة مستخدم</button>
     `;
 }
@@ -263,6 +263,36 @@ function renderCurrentPage() {
 }
 
 function attachGlobalEvents() {
+    // منع أي سلوك غريب في حقول الإدخال
+    setTimeout(() => {
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (input.id === 'loginUsername') {
+                        document.getElementById('loginPassword')?.focus();
+                    } else if (input.id === 'loginPassword') {
+                        handleLogin();
+                    } else if (input.id === 'regUsername') {
+                        document.getElementById('regEmail')?.focus();
+                    } else if (input.id === 'regEmail') {
+                        document.getElementById('regPassword')?.focus();
+                    } else if (input.id === 'regPassword') {
+                        document.getElementById('regConfirm')?.focus();
+                    } else if (input.id === 'regConfirm') {
+                        handleRegister();
+                    } else if (input.id === 'forgotUsername') {
+                        document.getElementById('forgotEmail')?.focus();
+                    } else if (input.id === 'forgotEmail') {
+                        document.getElementById('newPassword')?.focus();
+                    } else if (input.id === 'newPassword') {
+                        handleForgot();
+                    }
+                }
+            });
+        });
+    }, 100);
+
     const dropdownBtn = document.querySelector('.user-menu > div');
     if (dropdownBtn) {
         dropdownBtn.onclick = (e) => {
