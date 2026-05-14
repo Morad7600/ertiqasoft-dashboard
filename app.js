@@ -246,7 +246,7 @@ function renderCurrentPage() {
     const app = document.getElementById('app');
     if (!app) return;
     let content = '';
-    if (!loggedUser && page !== 'register' && page !== 'forgot') {
+    if (!loggedUser && currentPage !== 'register' && currentPage !== 'forgot') {
         currentPage = 'login';
         content = renderLoginPage();
     } else {
