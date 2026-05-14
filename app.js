@@ -42,7 +42,6 @@ async function updateRealBattery() {
 
 // تحديث CPU تقريبي و RAM
 function updateSystemLoad() {
-    // CPU تقريبي (عبء الواجهة)
     if (performance && performance.now) {
         let start = performance.now();
         setTimeout(() => {
@@ -53,7 +52,6 @@ function updateSystemLoad() {
     } else {
         systemStats.cpu = Math.floor(Math.random() * 50 + 10);
     }
-    // RAM تقريبي
     if (performance.memory) {
         let used = (performance.memory.usedJSHeapSize / (1024 * 1024 * 1024)).toFixed(1);
         systemStats.ramUsed = Math.min(parseFloat(used), systemStats.ramTotal - 0.5);
@@ -62,7 +60,6 @@ function updateSystemLoad() {
     }
 }
 
-// تحديث دوري للبيانات
 function refreshSystemData() {
     updateSystemLoad();
     renderCurrentPage();
@@ -169,7 +166,6 @@ function renderIndexPage() {
 }
 
 function renderDashboardPage() {
-    // بطاقات الأقراص
     let drivesHtml = '';
     drives.forEach(d => {
         const percent = getPercentage(d.used, d.total).toFixed(1);
@@ -217,11 +213,11 @@ function renderStatsPage() {
 
 function renderAdminPage() {
     const users = JSON.parse(localStorage.getItem("users")) || [];
-    let usersHtml = '<table><thead><tr><th>المستخدم</th><th>البريد</th><th>الصلاحية</th><th>آخر دخول</th><th>حذف</th></tr></thead><tbody>';
+    let usersHtml = '<td><thead><tr><th>المستخدم</th><th>البريد</th><th>الصلاحية</th><th>آخر دخول</th><th>حذف</th></tr></thead><tbody>';
     users.forEach((user, idx) => {
         usersHtml += `<tr><td>${user.username}</td><td>${user.email}</td><td>${user.role === 'admin' ? 'مدير' : 'مستخدم'}</td><td>${user.lastLogin || '—'}</td><td><button onclick="deleteUser(${idx})">حذف</button></td></tr>`;
     });
-    usersHtml += '</tbody></table>';
+    usersHtml += '</tbody></td>';
     return `
         ${renderTopBar()}
         <h1>👑 لوحة المدير</h1>
@@ -246,6 +242,7 @@ function renderCurrentPage() {
     const app = document.getElementById('app');
     if (!app) return;
     let content = '';
+    
     if (!loggedUser && currentPage !== 'register' && currentPage !== 'forgot') {
         currentPage = 'login';
         content = renderLoginPage();
@@ -271,7 +268,7 @@ function attachGlobalEvents() {
         dropdownBtn.onclick = (e) => {
             e.stopPropagation();
             const dropdown = document.getElementById('userDropdown');
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            if (dropdown) dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         };
     }
     document.onclick = () => {
@@ -279,6 +276,11 @@ function attachGlobalEvents() {
         if (dd) dd.style.display = 'none';
     };
 }
+
+window.toggleUserMenu = function() {
+    const dropdown = document.getElementById('userDropdown');
+    if (dropdown) dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+};
 
 // ========================
 // 5. دوال تسجيل الدخول والإدارة
@@ -288,13 +290,14 @@ window.handleLogin = function() {
     const password = document.getElementById('loginPassword')?.value.trim();
     const users = JSON.parse(localStorage.getItem('users'));
     const user = users.find(u => u.username === username && u.password === password);
+    const errorDiv = document.getElementById('loginError');
     if (user) {
         loggedUser = user;
         localStorage.setItem('loggedInUser', JSON.stringify(loggedUser));
-        document.getElementById('loginError').innerHTML = '<span style="color:#2ecc71">✅ تم الدخول بنجاح</span>';
+        if (errorDiv) errorDiv.innerHTML = '<span style="color:#2ecc71">✅ تم الدخول بنجاح</span>';
         setTimeout(() => navigateTo('index'), 1000);
     } else {
-        document.getElementById('loginError').innerHTML = '❌ خطأ في الاسم أو كلمة المرور';
+        if (errorDiv) errorDiv.innerHTML = '❌ خطأ في الاسم أو كلمة المرور';
     }
 };
 
